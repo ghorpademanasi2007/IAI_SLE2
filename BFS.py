@@ -2,7 +2,7 @@ from collections import deque
 import time
 
 
-# Breadth First Search: returns the path to target and number of expanded nodes.
+# Breadth First Search: returns path, expanded-node count and found status.
 def bfs_search(graph, start, target):
     queue = deque([(start, [start])])
     visited = {start}
@@ -23,21 +23,25 @@ def bfs_search(graph, start, target):
     return None, expanded
 
 
-def measure_case(graph, start, target, repetitions=1000):
+def benchmark_case(graph, start, target, runs=10000):
     times = []
     path = None
     nodes = 0
 
-    for _ in range(repetitions):
+    # Warm-up run avoids using the first call as the only measurement.
+    bfs_search(graph, start, target)
+
+    for _ in range(runs):
         begin = time.perf_counter()
         path, nodes = bfs_search(graph, start, target)
         end = time.perf_counter()
         times.append((end - begin) * 1000)
 
-    return path, nodes, times
+    average = sum(times) / len(times)
+    return path, nodes, average, min(times), max(times)
 
 
-# Seven-node graph used for the experiment.
+# Seven-node directed graph used for the experiment.
 graph = {
     'A': ['B', 'C'],
     'B': ['D', 'E'],
@@ -57,43 +61,44 @@ if __name__ == '__main__':
         ('Worst', 'Z')
     ]
 
-    print('=' * 58)
-    print('             BFS PERFORMANCE ANALYSIS')
-    print('=' * 58)
-    print('Graph nodes : A, B, C, D, E, F, G')
+    print('=' * 70)
+    print('                 BFS PERFORMANCE ANALYSIS')
+    print('=' * 70)
+    print('Graph       : A, B, C, D, E, F, G')
     print('Start node  : A')
-    print('Runs/case   : 1000')
+    print('Runs/case   : 10000')
     print()
 
     results = []
 
     for case_name, target in cases:
-        path, nodes, times = measure_case(graph, start, target)
-        average = sum(times) / len(times)
-        best = min(times)
-        worst = max(times)
+        path, nodes, average, best, worst = benchmark_case(
+            graph, start, target
+        )
         path_text = ' -> '.join(path) if path else 'Not found'
-
         results.append((case_name, target, average, best, worst, nodes))
 
         print(f'{case_name.upper()} CASE')
-        print(f'Target          : {target}')
-        print(f'Path            : {path_text}')
-        print(f'Nodes expanded  : {nodes}')
-        print(f'Average time    : {average:.6f} ms')
-        print(f'Best time       : {best:.6f} ms')
-        print(f'Worst time      : {worst:.6f} ms')
-        print('-' * 58)
+        print(f'Target         : {target}')
+        print(f'Path           : {path_text}')
+        print(f'Nodes expanded : {nodes}')
+        print(f'Average time   : {average:.6f} ms')
+        print(f'Best time      : {best:.6f} ms')
+        print(f'Worst time     : {worst:.6f} ms')
+        print('-' * 70)
 
-    print('\n' + '=' * 58)
-    print('                 SUMMARY TABLE')
-    print('=' * 58)
-    print(f"{'Case':<12}{'Target':<10}{'Average(ms)':<16}{'Best(ms)':<14}{'Worst(ms)':<14}{'Nodes':<8}")
-    print('-' * 74)
+    print('\n' + '=' * 70)
+    print('                     BFS SUMMARY TABLE')
+    print('=' * 70)
+    print(f"{'Case':<12}{'Target':<10}{'Average(ms)':<17}{'Best(ms)':<15}{'Worst(ms)':<15}{'Nodes':<8}")
+    print('-' * 77)
 
     for row in results:
-        print(f'{row[0]:<12}{row[1]:<10}{row[2]:<16.6f}{row[3]:<14.6f}{row[4]:<14.6f}{row[5]:<8}')
+        print(
+            f'{row[0]:<12}{row[1]:<10}{row[2]:<17.6f}'
+            f'{row[3]:<15.6f}{row[4]:<15.6f}{row[5]:<8}'
+        )
 
-    print('-' * 74)
-    print('Complexity: Best = O(1), Average/Worst = O(V + E)')
-    print('Memory: O(V) for the queue and visited set')
+    print('-' * 77)
+    print('Search complexity: Best O(1), Average/Worst O(V + E) upper bound')
+    print('Space complexity : O(V)')
