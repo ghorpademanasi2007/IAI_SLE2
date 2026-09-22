@@ -1,92 +1,80 @@
 import time
 
+# DFS graph
+GRAPH = {
+    "A": ["B", "C"],
+    "B": ["D", "E"],
+    "C": ["F"],
+    "D": ["G"],
+    "E": ["G"],
+    "F": ["G"],
+    "G": []
+}
 
-# ---------------- DFS SEARCH ----------------
-def dfs_search(graph, vertex, target, visited=None, path=None, expanded=None):
+
+def dfs_search(graph, node, target, visited=None, path=None):
     if visited is None:
         visited = set()
     if path is None:
         path = []
-    if expanded is None:
-        expanded = [0]
 
-    if vertex in visited:
-        return None, expanded[0]
+    visited.add(node)
+    path = path + [node]
 
-    visited.add(vertex)
-    expanded[0] += 1
-    current_path = path + [vertex]
+    if node == target:
+        return path, len(visited)
 
-    if vertex == target:
-        return current_path, expanded[0]
+    for neighbour in graph[node]:
+        if neighbour not in visited:
+            result = dfs_search(graph, neighbour, target, visited, path)
+            if result[0] is not None:
+                return result
 
-    for neighbour in graph[vertex]:
-        result, count = dfs_search(
-            graph, neighbour, target, visited, current_path, expanded
-        )
-        if result is not None:
-            return result, count
-
-    return None, expanded[0]
+    return None, len(visited)
 
 
-# ---------------- GRAPH ----------------
-graph = {
-    'A': ['B', 'C'],
-    'B': ['D', 'E'],
-    'C': ['F'],
-    'D': ['G'],
-    'E': ['G'],
-    'F': ['G'],
-    'G': []
-}
+def measure_dfs(target, runs=5000):
+    dfs_search(GRAPH, "A", target)
 
-
-# ---------------- TIMING ----------------
-def measure_dfs(target, runs=10000):
     times = []
     path = None
-    nodes = 0
-
-    # Warm-up
-    dfs_search(graph, 'A', target)
+    expanded = 0
 
     for _ in range(runs):
         start_time = time.perf_counter()
-        path, nodes = dfs_search(graph, 'A', target)
+        path, expanded = dfs_search(GRAPH, "A", target)
         end_time = time.perf_counter()
         times.append((end_time - start_time) * 1000)
 
-    average = sum(times) / len(times)
-    best = min(times)
-    worst = max(times)
-
-    return path, nodes, average, best, worst
+    return path, expanded, sum(times) / len(times), min(times), max(times)
 
 
-# ---------------- MAIN ----------------
-if __name__ == '__main__':
-    cases = [('Best', 'A'), ('Average', 'E'), ('Worst', 'Z')]
+def print_result(case_name, target):
+    path, expanded, average, best, worst = measure_dfs(target)
+    path_text = " -> ".join(path) if path else "Not found"
 
-    print('\n' + '=' * 88)
-    print('                    DFS PERFORMANCE ANALYSIS')
-    print('=' * 88)
-    print('Graph: A -> B,C | B -> D,E | C -> F | D,E,F -> G')
-    print('Runs per case: 10000')
+    print(f"{case_name:<10} {target:<8} {average:<15.6f} {best:<15.6f} {worst:<15.6f} {expanded:<8}")
+    print(f"Path: {path_text}")
+    return average, best, worst, expanded
 
-    print('\n' + '-' * 88)
-    print(f"{'Case':<12}{'Target':<10}{'Average(ms)':<18}{'Best(ms)':<16}{'Worst(ms)':<16}{'Nodes':<8}")
-    print('-' * 88)
 
-    for case, target in cases:
-        path, nodes, average, best, worst = measure_dfs(target)
-        print(f'{case:<12}{target:<10}{average:<18.6f}{best:<16.6f}{worst:<16.6f}{nodes:<8}')
-        print('Path:', ' -> '.join(path) if path else 'Not Found')
+if __name__ == "__main__":
+    print("=" * 82)
+    print("                 DFS GRAPH TRAVERSAL AND TIMING")
+    print("=" * 82)
+    print("Graph: A -> {B,C}, B -> {D,E}, C -> F, D/E/F -> G")
+    print("Timing runs per case: 5000")
+    print()
+    print(f"{'Case':<10} {'Target':<8} {'Average(ms)':<15} {'Best(ms)':<15} {'Worst(ms)':<15} {'Nodes':<8}")
+    print("-" * 82)
 
-    print('-' * 88)
-    print('Best search case    : O(1)')
-    print('Average search case : O(V + E) upper bound')
-    print('Worst search case   : O(V + E)')
-    print('Space complexity    : O(V)')
-    print('\nPy-spy command:')
-    print('py-spy record --rate 100 -o DFS_profile.svg -- python DFS.py')
+    best = print_result("Best", "A")
+    average = print_result("Average", "E")
+    worst = print_result("Worst", "Z")
+
+    print("-" * 82)
+    print("Complexity: Best O(1) when the start node is the target; otherwise DFS is O(V+E).")
+    print("Worst-case time complexity: O(V+E) and space complexity: O(V).")
+    print()
+    print("Py-spy command:")
+    print("py-spy record --rate 100 -o DFS_profile.svg -- python DFS.py")
