@@ -1,5 +1,5 @@
 digraph BFS_DFS {
-    rankdir=LR;
+    rankdir=TB;
     node [shape=circle];
 
     A -> B;
@@ -12,6 +12,7 @@ digraph BFS_DFS {
     F -> G;
 }
 
+// Start: A
 // Best target: A
 // Average target: E
 // Worst target: Z (not present)
