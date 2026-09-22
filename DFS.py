@@ -30,30 +30,7 @@ def dfs_search(graph, vertex, target, visited=None, path=None, expanded=None):
     return None, expanded[0]
 
 
-# ---------------- TIME MEASUREMENT ----------------
-def measure_dfs(graph, start, target, runs=10000):
-    times = []
-    path = None
-    nodes = 0
-
-    # Warm-up call before collecting measurements.
-    dfs_search(graph, start, target)
-
-    for _ in range(runs):
-        begin = time.perf_counter()
-        path, nodes = dfs_search(graph, start, target)
-        end = time.perf_counter()
-        times.append((end - begin) * 1000)
-
-    average_time = sum(times) / len(times)
-    best_time = min(times)
-    worst_time = max(times)
-
-    return path, nodes, average_time, best_time, worst_time
-
-
 # ---------------- GRAPH ----------------
-# Same graph is used for BFS and DFS comparison.
 graph = {
     'A': ['B', 'C'],
     'B': ['D', 'E'],
@@ -65,59 +42,51 @@ graph = {
 }
 
 
+# ---------------- TIMING ----------------
+def measure_dfs(target, runs=10000):
+    times = []
+    path = None
+    nodes = 0
+
+    # Warm-up
+    dfs_search(graph, 'A', target)
+
+    for _ in range(runs):
+        start_time = time.perf_counter()
+        path, nodes = dfs_search(graph, 'A', target)
+        end_time = time.perf_counter()
+        times.append((end_time - start_time) * 1000)
+
+    average = sum(times) / len(times)
+    best = min(times)
+    worst = max(times)
+
+    return path, nodes, average, best, worst
+
+
 # ---------------- MAIN ----------------
 if __name__ == '__main__':
-    start = 'A'
-    cases = [
-        ('Best', 'A'),       # Starting node is the target.
-        ('Average', 'E'),    # Partial graph exploration.
-        ('Worst', 'Z')       # Target does not exist.
-    ]
+    cases = [('Best', 'A'), ('Average', 'E'), ('Worst', 'Z')]
 
-    print('\n' + '=' * 82)
+    print('\n' + '=' * 88)
     print('                    DFS PERFORMANCE ANALYSIS')
-    print('=' * 82)
-    print('Graph       : A -> B,C | B -> D,E | C -> F | D,E,F -> G')
-    print('Start node  : A')
-    print('Runs/case   : 10000')
+    print('=' * 88)
+    print('Graph: A -> B,C | B -> D,E | C -> F | D,E,F -> G')
+    print('Runs per case: 10000')
 
-    results = []
+    print('\n' + '-' * 88)
+    print(f"{'Case':<12}{'Target':<10}{'Average(ms)':<18}{'Best(ms)':<16}{'Worst(ms)':<16}{'Nodes':<8}")
+    print('-' * 88)
 
-    for case_name, target in cases:
-        path, nodes, average, best, worst = measure_dfs(
-            graph, start, target
-        )
+    for case, target in cases:
+        path, nodes, average, best, worst = measure_dfs(target)
+        print(f'{case:<12}{target:<10}{average:<18.6f}{best:<16.6f}{worst:<16.6f}{nodes:<8}')
+        print('Path:', ' -> '.join(path) if path else 'Not Found')
 
-        path_text = ' -> '.join(path) if path else 'Not Found'
-        results.append((case_name, target, average, best, worst, nodes))
-
-        print('\n' + case_name.upper() + ' CASE')
-        print('Target          :', target)
-        print('Path            :', path_text)
-        print('Nodes expanded  :', nodes)
-        print(f'Average time    : {average:.6f} ms')
-        print(f'Best time       : {best:.6f} ms')
-        print(f'Worst time      : {worst:.6f} ms')
-
-    print('\n' + '=' * 82)
-    print('                         DFS TABLE')
-    print('=' * 82)
-    print(
-        f"{'Case':<12}{'Target':<10}{'Average(ms)':<17}"
-        f"{'Best(ms)':<15}{'Worst(ms)':<15}{'Nodes':<8}"
-    )
-    print('-' * 82)
-
-    for case_name, target, average, best, worst, nodes in results:
-        print(
-            f'{case_name:<12}{target:<10}{average:<17.6f}'
-            f'{best:<15.6f}{worst:<15.6f}{nodes:<8}'
-        )
-
-    print('-' * 82)
+    print('-' * 88)
     print('Best search case    : O(1)')
     print('Average search case : O(V + E) upper bound')
     print('Worst search case   : O(V + E)')
     print('Space complexity    : O(V)')
-    print('\nUse py-spy externally to create the profiling SVG:')
+    print('\nPy-spy command:')
     print('py-spy record --rate 100 -o DFS_profile.svg -- python DFS.py')
