@@ -2,21 +2,21 @@
 
 ## SLE-2: BFS and DFS Performance Analysis
 
-This project implements **Breadth First Search (BFS)** and **Depth First Search (DFS)** in Python. It demonstrates best, average and worst search cases, measured execution time, expanded nodes, graph paths, and **py-spy** profiling.
+This project implements **Breadth First Search (BFS)** and **Depth First Search (DFS)** in Python. It measures **average time, best time and worst time** for selected search cases and provides a direct BFS-vs-DFS comparison table. The programs can also be profiled using **py-spy**.
 
 ## Files
 
 | File | Purpose |
 |---|---|
-| `BFS.py` | BFS search with case-wise timing and node count |
-| `DFS.py` | DFS search with case-wise timing and node count |
+| `BFS.py` | BFS search with average, best and worst timing |
+| `DFS.py` | DFS search with average, best and worst timing |
 | `BFS_DFS_Comparison.py` | Combined BFS vs DFS comparison table |
-| `graph.dot` | Seven-node Graphviz/DOT graph |
+| `graph.dot` | Seven-node graph |
 | `CONTRIBUTION_LOG.md` | Contribution history |
 
 ## Graph
 
-The experiment uses a seven-node directed graph:
+The same graph is used for BFS and DFS so the measured comparison is consistent:
 
 ```text
               A
@@ -41,120 +41,115 @@ F -> G
 G -> none
 ```
 
-## Search Cases
+## Cases Used
 
-The programs search for a target from `A`.
+The programs search for a target starting from `A`.
 
-| Case | Target | Description | Complexity |
+| Case | Target | Meaning | Search complexity |
 |---|---|---|---|
 | Best | `A` | Target is the starting node | O(1) |
-| Average | `E` | Target requires partial graph exploration | O(V + E) upper bound |
-| Worst | `Z` | Target does not exist; all reachable nodes are explored | O(V + E) |
+| Average | `E` | Target is found after partial exploration | O(V + E) upper bound |
+| Worst | `Z` | Target is absent, so all reachable nodes are explored | O(V + E) |
 
-For a **complete traversal**, both BFS and DFS on an adjacency-list graph are O(V + E).
+For a complete graph traversal, both BFS and DFS are O(V + E) with an adjacency-list representation.
 
-## Program Output
+## Timing Method
 
-Each program performs **1000 timing runs per case** and displays:
+Each case is measured **10,000 times** using Python's `time.perf_counter()`.
 
-- Target vertex
+For every case the program reports:
+
+- **Average time** = total measured time / number of runs
+- **Best time** = smallest measured run time
+- **Worst time** = largest measured run time
 - Search path
-- Nodes expanded
-- Average measured time
-- Best measured time
-- Worst measured time
-- A final summary table
+- Number of nodes expanded
 
-Example format:
+The exact millisecond values are generated on the student's computer and are not hard-coded.
 
-```text
-==========================================================
-             BFS PERFORMANCE ANALYSIS
-==========================================================
-Graph nodes : A, B, C, D, E, F, G
-Start node  : A
-Runs/case   : 1000
+## BFS Output
 
-BEST CASE
-Target          : A
-Path            : A
-Nodes expanded  : 1
-Average time    : <your measured value> ms
-Best time       : <your measured value> ms
-Worst time      : <your measured value> ms
-----------------------------------------------------------
-
-AVERAGE CASE
-Target          : E
-Path            : A -> B -> E
-...
-
-WORST CASE
-Target          : Z
-Path            : Not found
-...
-
-SUMMARY TABLE
-Case        Target    Average(ms)    Best(ms)    Worst(ms)    Nodes
---------------------------------------------------------------------------
-Best        A         ...            ...         ...          1
-Average     E         ...            ...         ...          5
-Worst       Z         ...            ...         ...          7
-```
-
-The exact timing values are intentionally **not fixed** because they depend on the computer, Python version and system load.
-
-## Run the Programs
+Run:
 
 ```bash
 python BFS.py
 ```
 
+The output contains a section for each case followed by a table such as:
+
+```text
+Case        Target    Average(ms)      Best(ms)       Worst(ms)      Nodes
+-----------------------------------------------------------------------------
+Best        A         ...              ...            ...             1
+Average     E         ...              ...            ...             3
+Worst       Z         ...              ...            ...             7
+```
+
+## DFS Output
+
+Run:
+
 ```bash
 python DFS.py
 ```
 
-For the combined table:
+DFS prints the same metrics so the two algorithms can be compared using the same graph and targets.
+
+## BFS vs DFS Comparison
+
+Run:
 
 ```bash
 python BFS_DFS_Comparison.py
 ```
 
-## py-spy Profiling
+It prints one combined table:
 
-`py-spy` is used to record the Python program and generate an SVG flame graph. It is a profiling tool; it does not determine Big-O complexity.
-
-### Check installation
-
-```bash
-py-spy --version
+```text
+Case      Algorithm   Target   Average(ms)    Best(ms)    Worst(ms)    Nodes
+----------------------------------------------------------------------------
+Best      BFS         A        ...             ...         ...          1
+Best      DFS         A        ...             ...         ...          1
+Average   BFS         E        ...             ...         ...          3
+Average   DFS         E        ...             ...         ...          3
+Worst     BFS         Z        ...             ...         ...          7
+Worst     DFS         Z        ...             ...         ...          7
 ```
 
-If it is not recognized:
+The values shown as `...` are intentionally produced by the actual run rather than copied from another computer.
+
+## py-spy Profiling
+
+`py-spy` is a sampling profiler for Python. It can record a Python program and create an interactive SVG flame graph without modifying the program. citeturn0search0
+
+Install/check it with:
 
 ```bash
 python -m pip install py-spy
+py-spy --version
 ```
 
 ### Profile BFS
 
 ```bash
-py-spy record -o BFS_profile.svg -- python BFS.py
+py-spy record --rate 100 -o BFS_profile.svg -- python BFS.py
 ```
 
 ### Profile DFS
 
 ```bash
-py-spy record -o DFS_profile.svg -- python DFS.py
+py-spy record --rate 100 -o DFS_profile.svg -- python DFS.py
 ```
 
-### Profile the combined comparison
+### Profile the comparison program
 
 ```bash
-py-spy record -o BFS_DFS_profile.svg -- python BFS_DFS_Comparison.py
+py-spy record --rate 100 -o BFS_DFS_profile.svg -- python BFS_DFS_Comparison.py
 ```
 
-After profiling, open the generated `.svg` file in Chrome or another browser. The SVG is the actual profile generated from your computer and should be attached to the SLE-2 document if required.
+`py-spy record` supports running a Python command directly and writing the profile to an SVG file. citeturn0search0
+
+After the command finishes, open the generated `.svg` file in Chrome. The SVG is the actual profile generated from your computer.
 
 If Git Bash cannot find `py-spy`, run:
 
@@ -162,7 +157,15 @@ If Git Bash cannot find `py-spy`, run:
 where py-spy
 ```
 
-Then use the returned `.exe` path in the `py-spy record` command.
+Then use the returned `py-spy.exe` path.
+
+## Important Difference
+
+**Timing and profiling have different purposes:**
+
+- `time.perf_counter()` in the programs gives the numerical average/best/worst execution times.
+- `py-spy` gives a sampling profile/flame graph showing where execution time is spent. It does not calculate Big-O complexity. citeturn0search0
+- Big-O complexity is obtained from analysis of the algorithm.
 
 ## Complexity Summary
 
@@ -171,14 +174,12 @@ Then use the returned `.exe` path in the `py-spy record` command.
 | BFS | O(1) | O(V + E) upper bound | O(V + E) | O(V) |
 | DFS | O(1) | O(V + E) upper bound | O(V + E) | O(V) |
 
-These best/average/worst labels refer to **target searching**. For a full graph traversal, both algorithms use O(V + E) time.
-
 ## Learning Outcomes
 
 - Implement BFS using a queue.
 - Implement DFS using recursion.
-- Compare search paths and expanded nodes.
-- Measure execution time in milliseconds.
-- Understand best, average and worst search cases.
-- Generate profiling graphs using py-spy.
-- Maintain code and documentation in GitHub.
+- Measure average, best and worst execution times.
+- Count expanded nodes and display search paths.
+- Compare BFS and DFS in one table.
+- Generate SVG profiling graphs using py-spy.
+- Understand the difference between measured runtime and Big-O complexity.
