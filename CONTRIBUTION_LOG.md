@@ -6,15 +6,16 @@
 | 22-Sep-2026 | Manasi Ghorpade | Added BFS implementation in `BFS.py` | Completed |
 | 22-Sep-2026 | Manasi Ghorpade | Added DFS implementation in `DFS.py` | Completed |
 | 22-Sep-2026 | Manasi Ghorpade | Added seven-node graph in `graph.dot` | Completed |
-| 22-Sep-2026 | Manasi Ghorpade | Added best, average and worst search-case timing | Completed |
-| 22-Sep-2026 | Manasi Ghorpade | Added expanded-node counting and search paths | Completed |
-| 22-Sep-2026 | Manasi Ghorpade | Added combined BFS vs DFS comparison program | Completed |
-| 22-Sep-2026 | Manasi Ghorpade | Added py-spy profiling instructions and output format | Completed |
-| 22-Sep-2026 | Manasi Ghorpade | Updated README and complexity analysis | Completed |
+| 22-Sep-2026 | Manasi Ghorpade | Added average, best and worst timing measurements | Completed |
+| 22-Sep-2026 | Manasi Ghorpade | Added 10,000-run benchmarking for BFS and DFS | Completed |
+| 22-Sep-2026 | Manasi Ghorpade | Added combined BFS vs DFS comparison table | Completed |
+| 22-Sep-2026 | Manasi Ghorpade | Added py-spy profiling commands for BFS, DFS and comparison | Completed |
+| 22-Sep-2026 | Manasi Ghorpade | Updated README with timing and profiling methodology | Completed |
 
 ## Tools Used
 
 - Python 3
+- `time.perf_counter()` for execution-time measurement
 - Git and GitHub
-- py-spy for runtime profiling
+- py-spy for sampling profiling and SVG flame graphs
 - Graphviz-compatible DOT format for graph representation
