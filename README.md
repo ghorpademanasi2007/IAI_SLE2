@@ -1,22 +1,20 @@
 # IAI_SLE2
 
-## SLE-2: BFS and DFS Graph Traversal
+## SLE-2: BFS and DFS Search with Performance Analysis
 
-This repository contains Python implementations of **Breadth First Search (BFS)** and **Depth First Search (DFS)** for graph traversal. It also includes a graph representation, py-spy profiling commands, complexity analysis, and a contribution log.
+This repository contains Python implementations of **Breadth First Search (BFS)** and **Depth First Search (DFS)**. The programs demonstrate graph searching, best/average/worst-case analysis, execution-time measurement, and profiling with **py-spy**.
 
 ## Repository Files
 
 | File | Description |
 |---|---|
-| `BFS.py` | Breadth First Search implementation using a queue |
-| `DFS.py` | Depth First Search implementation using recursion |
+| `BFS.py` | BFS search with best/average/worst-case timing |
+| `DFS.py` | DFS search with best/average/worst-case timing |
 | `graph.dot` | Graph representation compatible with Graphviz |
 | `CONTRIBUTION_LOG.md` | Project contribution record |
 | `README.md` | Project documentation |
 
 ## Graph Used
-
-The graph contains six vertices: A, B, C, D, E and F.
 
 ```text
         A
@@ -26,124 +24,123 @@ The graph contains six vertices: A, B, C, D, E and F.
     D   E---F
 ```
 
-### Traversals from A
+The programs use an adjacency-list representation.
 
-- **BFS:** A -> B -> C -> D -> E -> F
-- **DFS:** A -> B -> D -> E -> F -> C
+## Case Analysis
+
+The programs search for a target vertex rather than always traversing the complete graph. Therefore, the case depends on where the target occurs.
+
+| Case | Target used | Meaning | Time complexity |
+|---|---|---|---|
+| Best | `A` | Target is the starting vertex | O(1) |
+| Average | `E` | Target is found after some exploration | O(V + E) upper bound |
+| Worst | `Z` | Target is absent, so all reachable vertices are explored | O(V + E) |
+
+For a **full traversal** of a graph represented by adjacency lists, both BFS and DFS are O(V + E). A full traversal does not have a meaningful O(1) best case because all reachable vertices/edges are processed. citeturn0search24turn0search14
+
+Here, `V` is the number of vertices and `E` is the number of edges.
 
 ## BFS
 
-BFS visits vertices level by level. It uses a queue, so the first discovered vertex is processed first.
+BFS uses a queue and explores the graph level by level.
 
-Run:
+Run normally:
 
 ```bash
 python BFS.py
 ```
 
-Expected output:
-
-```text
-BFS traversal: A -> B -> C -> D -> E -> F
-```
+The program prints whether each target is found and measures each case over 10,000 repetitions.
 
 ## DFS
 
-DFS explores one path as deeply as possible before backtracking. This implementation uses recursion.
+DFS uses recursion and explores one branch as deeply as possible before backtracking.
 
-Run:
+Run normally:
 
 ```bash
 python DFS.py
 ```
 
-Expected output:
-
-```text
-DFS traversal: A -> B -> D -> E -> F -> C
-```
-
-## Time and Space Complexity
-
-For an adjacency-list graph with **V vertices** and **E edges**:
-
-| Algorithm | Best Case | Average Case | Worst Case | Space |
-|---|---|---|---|---|
-| BFS | O(V + E) | O(V + E) | O(V + E) | O(V) |
-| DFS | O(V + E) | O(V + E) | O(V + E) | O(V) |
-
-For graph traversal, the standard complexity is O(V + E) because each reachable vertex and edge is processed a bounded number of times.
+The program prints whether each target is found and measures each case over 10,000 repetitions.
 
 ## py-spy Profiling
 
-`py-spy` is a sampling profiler for Python programs. It can be used without changing the BFS or DFS source code.
+`py-spy` is a sampling profiler for Python. Its `record` command can run a Python program and generate an SVG flame graph. citeturn0search0
 
-### 1. Check py-spy installation
+### Check installation
 
 ```bash
 py-spy --version
 ```
 
-If `py-spy` is not recognized, use the full executable path, for example:
+If needed:
 
 ```bash
-"/c/Users/<YOUR_USERNAME>/AppData/Roaming/Python/Python313/Scripts/py-spy.exe" --version
+pip install py-spy
 ```
 
-### 2. Profile BFS
-
-From the project folder:
+### Profile BFS
 
 ```bash
 py-spy record -o BFS_profile.svg -- python BFS.py
 ```
 
-If the command is not recognized, use:
-
-```bash
-"/c/Users/<YOUR_USERNAME>/AppData/Roaming/Python/Python313/Scripts/py-spy.exe" record -o BFS_profile.svg -- python BFS.py
-```
-
-### 3. Profile DFS
+### Profile DFS
 
 ```bash
 py-spy record -o DFS_profile.svg -- python DFS.py
 ```
 
-Or with the full executable path:
+The programs intentionally repeat each case 10,000 times so the profiler has enough execution activity to sample. The resulting SVG files can be opened in a browser.
+
+If `py-spy` is not recognized in Git Bash, first run:
 
 ```bash
-"/c/Users/<YOUR_USERNAME>/AppData/Roaming/Python/Python313/Scripts/py-spy.exe" record -o DFS_profile.svg -- python DFS.py
+where py-spy
 ```
 
-### 4. View the profiling graphs
+Then use the returned executable path, for example:
 
-After a successful run, py-spy creates:
+```bash
+"/c/Users/<YOUR_USERNAME>/AppData/Roaming/Python/Python313/Scripts/py-spy.exe" record -o BFS_profile.svg -- python BFS.py
+```
 
-- `BFS_profile.svg`
-- `DFS_profile.svg`
+The exact path depends on where Python installed `py-spy`.
 
-Open each SVG file in a web browser to inspect the profiling visualization.
+## Important Note About py-spy
 
-> Note: The SVG profiling files are generated on your computer when you run py-spy. They are not source-code files and should be added to GitHub only if your assignment specifically requires the generated profiles.
+py-spy is a **profiler**, not a tool that proves Big-O complexity. The Big-O cases are derived from the algorithm; py-spy provides a practical visualization of where the Python program spends execution time. citeturn0search0
+
+## Expected Outputs
+
+BFS and DFS both print three cases:
+
+```text
+Best case
+Average case
+Worst case
+```
+
+They also print measured elapsed time for 10,000 repetitions. Exact times will vary with the computer, Python version, and system load.
 
 ## Git Commands
 
-After adding or changing files locally:
+After making local changes or generating files:
 
 ```bash
 git status
 git add .
-git commit -m "Add BFS DFS profiling and documentation"
+git commit -m "Add BFS DFS case analysis and py-spy profiling"
 git push origin main
 ```
 
 ## Learning Outcomes
 
-- Understand graph representation using an adjacency list.
 - Implement BFS using a queue.
 - Implement DFS using recursion.
-- Compare BFS and DFS traversal order.
-- Understand time and space complexity.
-- Use py-spy to profile Python programs.
-- Maintain project documentation and a contribution log.
+- Understand best, average and worst search cases.
+- Understand O(1) early-success search and O(V + E) graph exploration.
+- Measure practical execution time with Python.
+- Generate profiling visualizations using py-spy.
+- Maintain a GitHub repository with documentation.
