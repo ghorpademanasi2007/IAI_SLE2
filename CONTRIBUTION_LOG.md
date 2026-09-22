@@ -9,6 +9,7 @@
 | 22-Sep-2026 | Manasi Ghorpade | Added average, best and worst timing measurements | Completed |
 | 22-Sep-2026 | Manasi Ghorpade | Added 10,000-run benchmarking for BFS and DFS | Completed |
 | 22-Sep-2026 | Manasi Ghorpade | Added combined BFS vs DFS comparison table | Completed |
+| 22-Sep-2026 | Manasi Ghorpade | Added standalone `5.py` to avoid import dependency errors | Completed |
 | 22-Sep-2026 | Manasi Ghorpade | Added py-spy profiling commands for BFS, DFS and comparison | Completed |
 | 22-Sep-2026 | Manasi Ghorpade | Updated README with timing and profiling methodology | Completed |
 
