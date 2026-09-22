@@ -1,28 +1,33 @@
 import time
 
 
-# Depth First Search: returns the path to target and number of expanded nodes.
-def dfs_search(graph, vertex, target, visited=None, path=None):
+# Depth First Search: returns the path to target and expanded-node count.
+def dfs_search(graph, vertex, target, visited=None, path=None, expanded=None):
     if visited is None:
         visited = set()
     if path is None:
         path = []
+    if expanded is None:
+        expanded = [0]
 
     if vertex in visited:
-        return None, len(path)
+        return None, expanded[0]
 
     visited.add(vertex)
-    path = path + [vertex]
+    expanded[0] += 1
+    current_path = path + [vertex]
 
     if vertex == target:
-        return path, len(path)
+        return current_path, expanded[0]
 
     for neighbor in graph[vertex]:
-        result, expanded = dfs_search(graph, neighbor, target, visited, path)
+        result, count = dfs_search(
+            graph, neighbor, target, visited, current_path, expanded
+        )
         if result is not None:
-            return result, expanded
+            return result, count
 
-    return None, len(path)
+    return None, expanded[0]
 
 
 def measure_case(graph, start, target, repetitions=1000):
