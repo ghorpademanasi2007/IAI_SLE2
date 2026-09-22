@@ -1,72 +1,128 @@
 # IAI_SLE2
 
-## SLE-2: BFS and DFS Search with Performance Analysis
+## SLE-2: BFS and DFS Performance Analysis
 
-This repository contains Python implementations of **Breadth First Search (BFS)** and **Depth First Search (DFS)**. The programs demonstrate graph searching, best/average/worst-case analysis, execution-time measurement, and profiling with **py-spy**.
+This project implements **Breadth First Search (BFS)** and **Depth First Search (DFS)** in Python. It demonstrates best, average and worst search cases, measured execution time, expanded nodes, graph paths, and **py-spy** profiling.
 
-## Repository Files
+## Files
 
-| File | Description |
+| File | Purpose |
 |---|---|
-| `BFS.py` | BFS search with best/average/worst-case timing |
-| `DFS.py` | DFS search with best/average/worst-case timing |
-| `graph.dot` | Graph representation compatible with Graphviz |
-| `CONTRIBUTION_LOG.md` | Project contribution record |
-| `README.md` | Project documentation |
+| `BFS.py` | BFS search with case-wise timing and node count |
+| `DFS.py` | DFS search with case-wise timing and node count |
+| `BFS_DFS_Comparison.py` | Combined BFS vs DFS comparison table |
+| `graph.dot` | Seven-node Graphviz/DOT graph |
+| `CONTRIBUTION_LOG.md` | Contribution history |
 
-## Graph Used
+## Graph
+
+The experiment uses a seven-node directed graph:
 
 ```text
-        A
-       / \
-      B   C
-     / \   \
-    D   E---F
+              A
+            /   \
+           B     C
+         /  \     \
+        D    E     F
+         \   |    /
+          \  |   /
+             G
 ```
 
-The programs use an adjacency-list representation.
+Adjacency list:
 
-## Case Analysis
+```text
+A -> B, C
+B -> D, E
+C -> F
+D -> G
+E -> G
+F -> G
+G -> none
+```
 
-The programs search for a target vertex rather than always traversing the complete graph. Therefore, the case depends on where the target occurs.
+## Search Cases
 
-| Case | Target used | Meaning | Time complexity |
+The programs search for a target from `A`.
+
+| Case | Target | Description | Complexity |
 |---|---|---|---|
-| Best | `A` | Target is the starting vertex | O(1) |
-| Average | `E` | Target is found after some exploration | O(V + E) upper bound |
-| Worst | `Z` | Target is absent, so all reachable vertices are explored | O(V + E) |
+| Best | `A` | Target is the starting node | O(1) |
+| Average | `E` | Target requires partial graph exploration | O(V + E) upper bound |
+| Worst | `Z` | Target does not exist; all reachable nodes are explored | O(V + E) |
 
-For a **full traversal** of a graph represented by adjacency lists, both BFS and DFS are O(V + E). A full traversal does not have a meaningful O(1) best case because all reachable vertices/edges are processed. citeturn0search24turn0search14
+For a **complete traversal**, both BFS and DFS on an adjacency-list graph are O(V + E).
 
-Here, `V` is the number of vertices and `E` is the number of edges.
+## Program Output
 
-## BFS
+Each program performs **1000 timing runs per case** and displays:
 
-BFS uses a queue and explores the graph level by level.
+- Target vertex
+- Search path
+- Nodes expanded
+- Average measured time
+- Best measured time
+- Worst measured time
+- A final summary table
 
-Run normally:
+Example format:
+
+```text
+==========================================================
+             BFS PERFORMANCE ANALYSIS
+==========================================================
+Graph nodes : A, B, C, D, E, F, G
+Start node  : A
+Runs/case   : 1000
+
+BEST CASE
+Target          : A
+Path            : A
+Nodes expanded  : 1
+Average time    : <your measured value> ms
+Best time       : <your measured value> ms
+Worst time      : <your measured value> ms
+----------------------------------------------------------
+
+AVERAGE CASE
+Target          : E
+Path            : A -> B -> E
+...
+
+WORST CASE
+Target          : Z
+Path            : Not found
+...
+
+SUMMARY TABLE
+Case        Target    Average(ms)    Best(ms)    Worst(ms)    Nodes
+--------------------------------------------------------------------------
+Best        A         ...            ...         ...          1
+Average     E         ...            ...         ...          5
+Worst       Z         ...            ...         ...          7
+```
+
+The exact timing values are intentionally **not fixed** because they depend on the computer, Python version and system load.
+
+## Run the Programs
 
 ```bash
 python BFS.py
 ```
 
-The program prints whether each target is found and measures each case over 10,000 repetitions.
-
-## DFS
-
-DFS uses recursion and explores one branch as deeply as possible before backtracking.
-
-Run normally:
-
 ```bash
 python DFS.py
 ```
 
-The program prints whether each target is found and measures each case over 10,000 repetitions.
+For the combined table:
+
+```bash
+python BFS_DFS_Comparison.py
+```
 
 ## py-spy Profiling
 
-`py-spy` is a sampling profiler for Python. Its `record` command can run a Python program and generate an SVG flame graph. citeturn0search0
+`py-spy` is used to record the Python program and generate an SVG flame graph. It is a profiling tool; it does not determine Big-O complexity.
 
 ### Check installation
 
@@ -74,10 +130,10 @@ The program prints whether each target is found and measures each case over 10,0
 py-spy --version
 ```
 
-If needed:
+If it is not recognized:
 
 ```bash
-pip install py-spy
+python -m pip install py-spy
 ```
 
 ### Profile BFS
@@ -92,55 +148,37 @@ py-spy record -o BFS_profile.svg -- python BFS.py
 py-spy record -o DFS_profile.svg -- python DFS.py
 ```
 
-The programs intentionally repeat each case 10,000 times so the profiler has enough execution activity to sample. The resulting SVG files can be opened in a browser.
+### Profile the combined comparison
 
-If `py-spy` is not recognized in Git Bash, first run:
+```bash
+py-spy record -o BFS_DFS_profile.svg -- python BFS_DFS_Comparison.py
+```
+
+After profiling, open the generated `.svg` file in Chrome or another browser. The SVG is the actual profile generated from your computer and should be attached to the SLE-2 document if required.
+
+If Git Bash cannot find `py-spy`, run:
 
 ```bash
 where py-spy
 ```
 
-Then use the returned executable path, for example:
+Then use the returned `.exe` path in the `py-spy record` command.
 
-```bash
-"/c/Users/<YOUR_USERNAME>/AppData/Roaming/Python/Python313/Scripts/py-spy.exe" record -o BFS_profile.svg -- python BFS.py
-```
+## Complexity Summary
 
-The exact path depends on where Python installed `py-spy`.
+| Algorithm | Best Search Case | Average Search Case | Worst Search Case | Space |
+|---|---|---|---|---|
+| BFS | O(1) | O(V + E) upper bound | O(V + E) | O(V) |
+| DFS | O(1) | O(V + E) upper bound | O(V + E) | O(V) |
 
-## Important Note About py-spy
-
-py-spy is a **profiler**, not a tool that proves Big-O complexity. The Big-O cases are derived from the algorithm; py-spy provides a practical visualization of where the Python program spends execution time. citeturn0search0
-
-## Expected Outputs
-
-BFS and DFS both print three cases:
-
-```text
-Best case
-Average case
-Worst case
-```
-
-They also print measured elapsed time for 10,000 repetitions. Exact times will vary with the computer, Python version, and system load.
-
-## Git Commands
-
-After making local changes or generating files:
-
-```bash
-git status
-git add .
-git commit -m "Add BFS DFS case analysis and py-spy profiling"
-git push origin main
-```
+These best/average/worst labels refer to **target searching**. For a full graph traversal, both algorithms use O(V + E) time.
 
 ## Learning Outcomes
 
 - Implement BFS using a queue.
 - Implement DFS using recursion.
+- Compare search paths and expanded nodes.
+- Measure execution time in milliseconds.
 - Understand best, average and worst search cases.
-- Understand O(1) early-success search and O(V + E) graph exploration.
-- Measure practical execution time with Python.
-- Generate profiling visualizations using py-spy.
-- Maintain a GitHub repository with documentation.
+- Generate profiling graphs using py-spy.
+- Maintain code and documentation in GitHub.
