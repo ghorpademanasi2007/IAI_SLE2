@@ -1,0 +1,14 @@
+graph BFS_DFS {
+    rankdir=LR;
+    node [shape=circle];
+
+    A -- B;
+    A -- C;
+    B -- D;
+    B -- E;
+    C -- F;
+    E -- F;
+}
+
+// BFS from A: A -> B -> C -> D -> E -> F
+// DFS from A: A -> B -> D -> E -> F -> C
