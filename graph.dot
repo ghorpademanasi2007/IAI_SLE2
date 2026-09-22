@@ -1,18 +1,13 @@
-digraph BFS_DFS {
+graph BFS_DFS_Graph {
     rankdir=TB;
     node [shape=circle];
 
-    A -> B;
-    A -> C;
-    B -> D;
-    B -> E;
-    C -> F;
-    D -> G;
-    E -> G;
-    F -> G;
+    A -- B;
+    A -- C;
+    B -- D;
+    B -- E;
+    C -- F;
+    D -- G;
+    E -- G;
+    F -- G;
 }
-
-// Start: A
-// Best target: A
-// Average target: E
-// Worst target: Z (not present)
