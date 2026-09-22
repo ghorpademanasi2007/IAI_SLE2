@@ -2,83 +2,98 @@ from collections import deque
 import time
 
 
-# BFS search: stops when the target vertex is found.
+# Breadth First Search: returns the path to target and number of expanded nodes.
 def bfs_search(graph, start, target):
+    queue = deque([(start, [start])])
     visited = {start}
-    queue = deque([start])
+    expanded = 0
 
     while queue:
-        vertex = queue.popleft()
+        vertex, path = queue.popleft()
+        expanded += 1
 
         if vertex == target:
-            return True
+            return path, expanded
 
         for neighbor in graph[vertex]:
             if neighbor not in visited:
                 visited.add(neighbor)
-                queue.append(neighbor)
+                queue.append((neighbor, path + [neighbor]))
 
-    return False
+    return None, expanded
 
 
-def benchmark_case(graph, start, target, repetitions=10000):
-    start_time = time.perf_counter()
+def measure_case(graph, start, target, repetitions=1000):
+    times = []
+    path = None
+    nodes = 0
 
     for _ in range(repetitions):
-        bfs_search(graph, start, target)
+        begin = time.perf_counter()
+        path, nodes = bfs_search(graph, start, target)
+        end = time.perf_counter()
+        times.append((end - begin) * 1000)
 
-    end_time = time.perf_counter()
-    return end_time - start_time
+    return path, nodes, times
 
 
-# Same graph used for the traversal and profiling experiment.
+# Seven-node graph used for the experiment.
 graph = {
     'A': ['B', 'C'],
-    'B': ['A', 'D', 'E'],
-    'C': ['A', 'F'],
-    'D': ['B'],
-    'E': ['B', 'F'],
-    'F': ['C', 'E']
+    'B': ['D', 'E'],
+    'C': ['F'],
+    'D': ['G'],
+    'E': ['G'],
+    'F': ['G'],
+    'G': []
 }
 
 
 if __name__ == '__main__':
     start = 'A'
+    cases = [
+        ('Best', 'A'),
+        ('Average', 'E'),
+        ('Worst', 'Z')
+    ]
 
-    # Best case: target is the starting vertex.
-    best_target = 'A'
-
-    # Average case: target is a middle/deeper vertex.
-    average_target = 'E'
-
-    # Worst case: target is not present, so all reachable vertices are searched.
-    worst_target = 'Z'
-
-    print('BFS Search Analysis')
-    print('Graph: A-B-C-D-E-F')
+    print('=' * 58)
+    print('             BFS PERFORMANCE ANALYSIS')
+    print('=' * 58)
+    print('Graph nodes : A, B, C, D, E, F, G')
+    print('Start node  : A')
+    print('Runs/case   : 1000')
     print()
 
-    print('Best case target   :', best_target)
-    print('Found              :', bfs_search(graph, start, best_target))
-    print('Time complexity    : O(1)')
-    print()
+    results = []
 
-    print('Average case target:', average_target)
-    print('Found              :', bfs_search(graph, start, average_target))
-    print('Time complexity    : O(V + E)')
-    print()
+    for case_name, target in cases:
+        path, nodes, times = measure_case(graph, start, target)
+        average = sum(times) / len(times)
+        best = min(times)
+        worst = max(times)
+        path_text = ' -> '.join(path) if path else 'Not found'
 
-    print('Worst case target  :', worst_target)
-    print('Found              :', bfs_search(graph, start, worst_target))
-    print('Time complexity    : O(V + E)')
-    print()
+        results.append((case_name, target, average, best, worst, nodes))
 
-    # Repeated runs make the program long enough for py-spy to sample.
-    print('Measured execution time over 10,000 repetitions:')
-    best_time = benchmark_case(graph, start, best_target)
-    average_time = benchmark_case(graph, start, average_target)
-    worst_time = benchmark_case(graph, start, worst_target)
+        print(f'{case_name.upper()} CASE')
+        print(f'Target          : {target}')
+        print(f'Path            : {path_text}')
+        print(f'Nodes expanded  : {nodes}')
+        print(f'Average time    : {average:.6f} ms')
+        print(f'Best time       : {best:.6f} ms')
+        print(f'Worst time      : {worst:.6f} ms')
+        print('-' * 58)
 
-    print(f'Best case   : {best_time:.6f} seconds')
-    print(f'Average case: {average_time:.6f} seconds')
-    print(f'Worst case  : {worst_time:.6f} seconds')
+    print('\n' + '=' * 58)
+    print('                 SUMMARY TABLE')
+    print('=' * 58)
+    print(f"{'Case':<12}{'Target':<10}{'Average(ms)':<16}{'Best(ms)':<14}{'Worst(ms)':<14}{'Nodes':<8}")
+    print('-' * 74)
+
+    for row in results:
+        print(f'{row[0]:<12}{row[1]:<10}{row[2]:<16.6f}{row[3]:<14.6f}{row[4]:<14.6f}{row[5]:<8}')
+
+    print('-' * 74)
+    print('Complexity: Best = O(1), Average/Worst = O(V + E)')
+    print('Memory: O(V) for the queue and visited set')
